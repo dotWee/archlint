@@ -21,7 +21,7 @@ architecture_check:
 
 ## Relatórios de testes JUnit
 
-`archlint scan --format junit` grava um XML JUnit que o GitLab coleta com [`artifacts:reports:junit`](https://docs.gitlab.com/ci/testing/unit_test_reports/). O GitLab mostra os resultados na aba **Tests** do pipeline e no resumo de testes do merge request.
+`archlint scan --format junit` imprime o XML no stdout. Ele grava um arquivo apenas quando se passa `--report`. `archlint scan --format junit --report archlint-junit.xml` grava o arquivo que o GitLab coleta com [`artifacts:reports:junit`](https://docs.gitlab.com/ci/testing/unit_test_reports/). O GitLab mostra os resultados na aba **Tests** do pipeline e no resumo de testes do merge request.
 
 Cada detector vira um `<testsuite>`. Cada smell vira um `<testcase>` com falha:
 

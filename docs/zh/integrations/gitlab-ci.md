@@ -21,7 +21,7 @@ architecture_check:
 
 ## JUnit 测试报告
 
-`archlint scan --format junit` 会写出 GitLab 通过 [`artifacts:reports:junit`](https://docs.gitlab.com/ci/testing/unit_test_reports/) 收集的 JUnit XML。结果出现在流水线的 **Tests** 标签页和合并请求的测试摘要中。
+`archlint scan --format junit` 把 XML 打印到 stdout。只有传入 `--report` 时才会写入文件。`archlint scan --format junit --report archlint-junit.xml` 会写出 GitLab 通过 [`artifacts:reports:junit`](https://docs.gitlab.com/ci/testing/unit_test_reports/) 收集的文件。结果出现在流水线的 **Tests** 标签页和合并请求的测试摘要中。
 
 每个检测器是一个 `<testsuite>`。每个 smell 是一个失败的 `<testcase>`：
 

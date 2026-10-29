@@ -116,7 +116,11 @@ fn render_suite(out: &mut String, suite: &Suite) {
 fn render_case(smell: &ArchSmell, explanation: &Explanation, scan_root: Option<&Path>) -> String {
     let rule_id = smell.smell_type.category().to_id();
     let location = primary_location(smell, scan_root);
-    let name = case_name(&explanation.problem, location.as_ref());
+    let name = case_name(
+        &explanation.problem,
+        location.as_ref(),
+        dead_symbol_name(smell),
+    );
     let mut attrs = format!(
         r#"name="{}" classname="{}""#,
         escape_attr(&name),
@@ -156,19 +160,32 @@ fn primary_location(smell: &ArchSmell, scan_root: Option<&Path>) -> Option<CaseL
     })
 }
 
-fn case_name(problem: &str, location: Option<&CaseLocation>) -> String {
+fn dead_symbol_name(smell: &ArchSmell) -> Option<&str> {
+    match &smell.smell_type {
+        crate::detectors::SmellType::DeadSymbol { name, .. } if !name.is_empty() => {
+            Some(name.as_str())
+        }
+        _ => None,
+    }
+}
+
+fn case_name(problem: &str, location: Option<&CaseLocation>, symbol: Option<&str>) -> String {
     let problem = if problem.is_empty() {
         "Architectural smell"
     } else {
         problem
     };
+    let labeled = match symbol {
+        Some(symbol) => format!("{problem}: {symbol}"),
+        None => problem.to_string(),
+    };
     match location {
         Some(CaseLocation {
             file,
             line: Some(line),
-        }) => format!("{problem} ({file}:{line})"),
-        Some(CaseLocation { file, line: None }) => format!("{problem} ({file})"),
-        None => problem.to_string(),
+        }) => format!("{labeled} ({file}:{line})"),
+        Some(CaseLocation { file, line: None }) => format!("{labeled} ({file})"),
+        None => labeled,
     }
 }
 
@@ -315,6 +332,30 @@ mod tests {
         assert!(xml.contains("Reason:"));
         assert!(xml.contains("Locations:"));
         assert!(xml.contains("a.ts:4 (import b)"));
+        assert!(!xml.contains("detected:"));
+    }
+
+    #[test]
+    fn dead_symbols_on_the_same_line_get_distinct_names() {
+        let smells = vec![
+            ArchSmell::new_dead_symbol_with_line(
+                PathBuf::from("a.ts"),
+                "foo".to_string(),
+                "Function".to_string(),
+                3,
+            ),
+            ArchSmell::new_dead_symbol_with_line(
+                PathBuf::from("a.ts"),
+                "bar".to_string(),
+                "Function".to_string(),
+                3,
+            ),
+        ];
+        let report = report_with(smells);
+        let xml = generate_junit(&report, &crate::config::SeverityConfig::default(), None);
+
+        assert!(xml.contains(r#"name="Unused Function detected: foo (a.ts:3)""#));
+        assert!(xml.contains(r#"name="Unused Function detected: bar (a.ts:3)""#));
     }
 
     #[test]
