@@ -119,7 +119,7 @@ fn render_case(smell: &ArchSmell, explanation: &Explanation, scan_root: Option<&
     let name = case_name(
         &explanation.problem,
         location.as_ref(),
-        dead_symbol_name(smell),
+        case_discriminator(smell),
     );
     let mut attrs = format!(
         r#"name="{}" classname="{}""#,
@@ -157,6 +157,15 @@ fn primary_location(smell: &ArchSmell, scan_root: Option<&Path>) -> Option<CaseL
     smell.files.first().map(|file| CaseLocation {
         file: normalize_path(file, scan_root),
         line: None,
+    })
+}
+
+fn case_discriminator(smell: &ArchSmell) -> Option<&str> {
+    if let Some(name) = dead_symbol_name(smell) {
+        return Some(name);
+    }
+    smell.locations.first().and_then(|location| {
+        (!location.description.is_empty()).then_some(location.description.as_str())
     })
 }
 
@@ -332,7 +341,29 @@ mod tests {
         assert!(xml.contains("Reason:"));
         assert!(xml.contains("Locations:"));
         assert!(xml.contains("a.ts:4 (import b)"));
-        assert!(!xml.contains("detected:"));
+        assert!(xml
+            .contains(r#"name="Circular dependency detected between 0 files: import b (a.ts:4)""#));
+    }
+
+    #[test]
+    fn side_effect_imports_on_the_same_line_get_distinct_names() {
+        let smells = vec![
+            ArchSmell::new_side_effect_import(PathBuf::from("a.ts"), "polyfill".to_string(), 2),
+            ArchSmell::new_side_effect_import(
+                PathBuf::from("a.ts"),
+                "reflect-metadata".to_string(),
+                2,
+            ),
+        ];
+        let report = report_with(smells);
+        let xml = generate_junit(&report, &crate::config::SeverityConfig::default(), None);
+
+        assert!(xml.contains(
+            r#"name="Side-Effect Import: Side-effect import of &apos;polyfill&apos; (a.ts:2)""#
+        ));
+        assert!(xml.contains(
+            r#"name="Side-Effect Import: Side-effect import of &apos;reflect-metadata&apos; (a.ts:2)""#
+        ));
     }
 
     #[test]
