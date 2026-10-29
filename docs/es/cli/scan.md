@@ -17,7 +17,7 @@ archlint scan [path] [options]
 
 | Opción                          | Por defecto | Descripción                                               |
 | ------------------------------- | ----------- | --------------------------------------------------------- |
-| `-f, --format <format>`         | `table`     | Formato de salida: `table`, `json`, `markdown`, `sarif`   |
+| `-f, --format <format>`         | `table`     | Formato de salida: `table`, `json`, `markdown`, `sarif`, `junit` |
 | `-j, --json`                    | `false`     | Atajo para `--format json`                                |
 | `-r, --report <file>`           | `stdout`    | Guarda el informe en un archivo                           |
 | `-s, --min-severity <sev>`      | `low`       | Filtra por severidad: `low`, `medium`, `high`, `critical` |
@@ -41,6 +41,14 @@ archlint scan --format markdown --report report.md
 ```bash
 archlint scan --format sarif --report results.sarif
 ```
+
+### Exportar a JUnit (para informes de tests en CI)
+
+```bash
+archlint scan --format junit --report archlint-junit.xml
+```
+
+GitLab puede publicar este archivo como informe de tests. Consulta [GitLab CI](/es/integrations/gitlab-ci#informes-de-tests-junit).
 
 ### Ejecutar solo detección de ciclos
 

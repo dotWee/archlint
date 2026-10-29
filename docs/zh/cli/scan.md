@@ -17,7 +17,7 @@ archlint scan [path] [options]
 
 | 选项                            | 默认值   | 描述                                                |
 | ------------------------------- | -------- | --------------------------------------------------- |
-| `-f, --format <format>`         | `table`  | 输出格式：`table`, `json`, `markdown`, `sarif`      |
+| `-f, --format <format>`         | `table`  | 输出格式：`table`, `json`, `markdown`, `sarif`, `junit` |
 | `-j, --json`                    | `false`  | `--format json` 的快捷方式                          |
 | `-r, --report <file>`           | `stdout` | 将报告保存到文件                                    |
 | `-s, --min-severity <sev>`      | `low`    | 按严重程度过滤：`low`, `medium`, `high`, `critical` |
@@ -41,6 +41,14 @@ archlint scan --format markdown --report report.md
 ```bash
 archlint scan --format sarif --report results.sarif
 ```
+
+### 导出为 JUnit（用于 CI 测试报告）
+
+```bash
+archlint scan --format junit --report archlint-junit.xml
+```
+
+GitLab 可以将该文件发布为测试报告。参见 [GitLab CI](/zh/integrations/gitlab-ci#junit-测试报告)。
 
 ### 仅运行循环依赖检测
 

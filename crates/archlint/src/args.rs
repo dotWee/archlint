@@ -124,7 +124,7 @@ impl ScanArgs {
         self.quiet
             || matches!(
                 self.output_format(),
-                OutputFormat::Json | OutputFormat::Sarif
+                OutputFormat::Json | OutputFormat::Sarif | OutputFormat::Junit
             )
     }
 }
@@ -143,4 +143,6 @@ pub enum OutputFormat {
     Json,
     #[cfg_attr(feature = "cli", value(name = "sarif"))]
     Sarif,
+    #[cfg_attr(feature = "cli", value(name = "junit"))]
+    Junit,
 }

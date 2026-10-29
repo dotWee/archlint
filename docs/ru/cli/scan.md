@@ -17,7 +17,7 @@ archlint scan [path] [options]
 
 | Опция                           | По умолчанию | Описание                                                   |
 | ------------------------------- | ------------ | ---------------------------------------------------------- |
-| `-f, --format <format>`         | `table`      | Формат вывода: `table`, `json`, `markdown`, `sarif`        |
+| `-f, --format <format>`         | `table`      | Формат вывода: `table`, `json`, `markdown`, `sarif`, `junit` |
 | `-j, --json`                    | `false`      | Сокращение для `--format json`                             |
 | `-r, --report <file>`           | `stdout`     | Сохранить отчет в файл                                     |
 | `-s, --min-severity <sev>`      | `low`        | Фильтр по критичности: `low`, `medium`, `high`, `critical` |
@@ -41,6 +41,14 @@ archlint scan --format markdown --report report.md
 ```bash
 archlint scan --format sarif --report results.sarif
 ```
+
+### Экспорт в JUnit (для отчётов о тестах в CI)
+
+```bash
+archlint scan --format junit --report archlint-junit.xml
+```
+
+GitLab может опубликовать этот файл как отчёт о тестах. См. [GitLab CI](/ru/integrations/gitlab-ci#отчеты-о-тестах-junit).
 
 ### Запуск только детектора циклов
 

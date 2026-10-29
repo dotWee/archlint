@@ -1,6 +1,6 @@
 ---
 title: scan
-description: 'Perform a complete architectural analysis of your project with the archlint scan command, supporting multiple output formats like JSON, Markdown, and SARIF.'
+description: 'Perform a complete architectural analysis of your project with the archlint scan command, supporting multiple output formats like JSON, Markdown, SARIF, and JUnit.'
 ---
 
 # archlint scan
@@ -15,9 +15,9 @@ archlint scan [path] [options]
 
 ## Options
 
-| Option                          | Default  | Description                                             |
-| ------------------------------- | -------- | ------------------------------------------------------- |
-| `-f, --format <format>`         | `table`  | Output format: `table`, `json`, `markdown`, `sarif`     |
+| Option                          | Default  | Description                                                  |
+| ------------------------------- | -------- | ------------------------------------------------------------ |
+| `-f, --format <format>`         | `table`  | Output format: `table`, `json`, `markdown`, `sarif`, `junit` |
 | `-j, --json`                    | `false`  | Shortcut for `--format json`                            |
 | `-r, --report <file>`           | `stdout` | Save the report to a file                               |
 | `-s, --min-severity <sev>`      | `low`    | Filter by severity: `low`, `medium`, `high`, `critical` |
@@ -41,6 +41,14 @@ archlint scan --format markdown --report report.md
 ```bash
 archlint scan --format sarif --report results.sarif
 ```
+
+### Export to JUnit (for CI test reports)
+
+```bash
+archlint scan --format junit --report archlint-junit.xml
+```
+
+GitLab, Jenkins, and Azure DevOps can publish this file as a unit-test report. Each smell is a failed test case, grouped by detector. A clean scan emits one passing test case. See [GitLab CI](/integrations/gitlab-ci#junit-test-reports) for a pipeline example.
 
 ### Only run cycle detection
 
